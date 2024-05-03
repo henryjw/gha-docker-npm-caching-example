@@ -14,13 +14,19 @@ jobs:
         with:
           images: Build
 
-      - name: Cache
-        uses: actions/cache@v3
+      - name: Cache (S3)
+        uses: tespkg/actions-cache@v1
         id: cache
         with:
+          bucket: gha-docker-npm-caching-example
+          accessKey: ${{ vars.AWS_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          use-fallback: false # No fallback since the purpose of this example is to demonstrate the cache to S3
           path: |
             pnpm
-          key: cache-${{ hashFiles('pnpm-lock.yaml') }}
+          key: pnpm-cache-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-cache-
 
       - name: inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.1.0

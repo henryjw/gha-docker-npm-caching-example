@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/core": "^3.567.0",
+    "aws-sdk": "^2.1613.0",
     "express": "^4.19.2",
     "node-gyp": "^10.1.0",
     "s3-zip": "^3.3.0",

@@ -9,7 +9,8 @@ WORKDIR /app
 COPY . .
 
 RUN  --mount=type=cache,target=/pnpm \
-  pnpm install --frozen-lockfile
+  pnpm config set store-dir ${PNPM_HOME} && \
+  pnpm install --frozen-lockfile --prefer-offline
 
 # Use a smaller Node.js image for the final image
 FROM node:alpine AS prod
