@@ -1,0 +1,43 @@
+---
+name: Build
+on:
+  push:
+
+jobs:
+  Build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: Build
+
+      - name: Cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            pnpm
+          key: cache-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: inject cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "pnpm": "/pnpm"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: Dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
